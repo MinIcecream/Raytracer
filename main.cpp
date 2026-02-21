@@ -66,7 +66,7 @@ void render(std::vector<Sphere>& spheres) {
 
 int main() {
     std::vector<Sphere> spheres;
-    Sphere sphere(Vec3(0, 0, 0), 1.0f, Vec3(255, 0, 0));
+    Sphere sphere(Vec3(0, 0, -5), 1.0f, Vec3(255, 0, 0));
     spheres.push_back(sphere);
     render(spheres);
     return 0;
