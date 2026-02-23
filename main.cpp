@@ -57,13 +57,22 @@ Vec3 trace(const Ray& ray, const std::vector<Sphere>& spheres) {
     // Find all emission sources and add their contribution
     for (const auto& s : spheres) {
         if (s.emissionStrength > 0) {
-            Vec3 shadowRayDir = (s.center - hitPoint).normalize();
+            bool blocked = false;
+            Vec3 toLight = s.center - hitPoint;
+            Vec3 shadowRayDir = toLight.normalize();
             Ray shadowRay(hitPoint, shadowRayDir);
             for (const auto& other : spheres) {
-                if (&other != &s && other.intersect(shadowRay, closestT)) {
-                    // Blocks light, does not contribute.
-                    continue;
+                float t;
+                if (other.emissionStrength == 0 && &other != closestSphere && &other != &s && other.intersect(shadowRay, t)) {
+                    if (t < toLight.length()){
+                        // Blocks light, does not contribute.
+                        blocked = true;
+                        break;
+                    }
                 }
+            }
+            if (blocked) {
+                continue;
             }
             color = color + closestSphere->color * s.emissionStrength * std::max(0.0f, normal.dot(shadowRayDir));
         }

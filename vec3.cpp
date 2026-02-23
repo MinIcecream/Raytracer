@@ -25,6 +25,10 @@ Vec3 Vec3::normalize() const {
     return Vec3(0, 0, 0); // Return zero vector if length is zero
 }
 
+float Vec3::length() const {
+    return sqrt(x * x + y * y + z * z);
+}
+
 float Vec3::dot(const Vec3& other) const {
     return x * other.x + y * other.y + z * other.z;
 }
