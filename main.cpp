@@ -30,11 +30,15 @@ Ray getRayToPixel(int x, int y, int width, int height) {
 }
 
 Vec3 trace(const Ray& ray, const std::vector<Sphere>& spheres) {
-    // TODO: Add support for multiple light sources and shadows
     float closestT;
     Sphere* closestSphere = nullptr;
+    Vec3 color = Vec3(0, 0, 0); // Background color
 
     for (const auto& sphere : spheres) {
+        if (sphere.emissionStrength > 0) {
+            continue; // Skip light sources
+        }
+
         float t;
         if (sphere.intersect(ray, t)) {
             if (!closestSphere || t < closestT) {
@@ -45,7 +49,7 @@ Vec3 trace(const Ray& ray, const std::vector<Sphere>& spheres) {
     }
 
     if (!closestSphere) {
-        return Vec3(0, 0, 0); // Background color
+        return color;
     }
 
     Vec3 hitPoint = ray.origin + ray.direction * closestT;
@@ -61,10 +65,10 @@ Vec3 trace(const Ray& ray, const std::vector<Sphere>& spheres) {
                     continue;
                 }
             }
-            return closestSphere->color * s.emissionStrength * std::max(0.0f, normal.dot(shadowRayDir));
+            color = color + closestSphere->color * s.emissionStrength * std::max(0.0f, normal.dot(shadowRayDir));
         }
     }
-    return Vec3(0, 0, 0); // Return background color for miss
+    return color; // Return background color for miss
 }
 
 void render(std::vector<Sphere>& spheres) {
@@ -96,8 +100,10 @@ int main() {
     std::vector<Sphere> spheres;
     Sphere sphere(Vec3(0, 0, -5), 1.0f, Vec3(255, 0, 0));
     Sphere source(Vec3(2, 2, -5), 0.1f, Vec3(255, 0, 0), 1.0f);
+    Sphere source2(Vec3(2, -2, -5), 0.1f, Vec3(255, 0, 0), 1.0f);
     spheres.push_back(sphere);
     spheres.push_back(source);
+    spheres.push_back(source2);
     render(spheres);
     return 0;
 }
