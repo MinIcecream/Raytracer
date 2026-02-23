@@ -59,11 +59,12 @@ Vec3 trace(const Ray& ray, const std::vector<Sphere>& spheres) {
         if (s.emissionStrength > 0) {
             bool blocked = false;
             Vec3 toLight = s.center - hitPoint;
+            Vec3 shadowRayOrigin = hitPoint + normal * 0.001f; // Offset to avoid self-intersection
             Vec3 shadowRayDir = toLight.normalize();
-            Ray shadowRay(hitPoint, shadowRayDir);
+            Ray shadowRay(shadowRayOrigin, shadowRayDir);
             for (const auto& other : spheres) {
                 float t;
-                if (other.emissionStrength == 0 && &other != closestSphere && &other != &s && other.intersect(shadowRay, t)) {
+                if (&other != &s && other.intersect(shadowRay, t)) {
                     if (t < toLight.length()){
                         // Blocks light, does not contribute.
                         blocked = true;
@@ -107,12 +108,12 @@ void render(std::vector<Sphere>& spheres) {
 
 int main() {
     std::vector<Sphere> spheres;
-    Sphere sphere(Vec3(0, 0, -5), 1.0f, Vec3(255, 0, 0));
+    Sphere sphere(Vec3(0, -3, -5), 1.0f, Vec3(255, 0, 0));
     Sphere source(Vec3(2, 2, -5), 0.1f, Vec3(255, 0, 0), 1.0f);
-    Sphere source2(Vec3(2, -2, -5), 0.1f, Vec3(255, 0, 0), 1.0f);
+    Sphere floor(Vec3(0, -10004, -5), 10000.0f, Vec3(255, 0, 0));
     spheres.push_back(sphere);
-    spheres.push_back(source);
-    spheres.push_back(source2);
+    spheres.push_back(source);  
+    spheres.push_back(floor);  
     render(spheres);
     return 0;
 }
