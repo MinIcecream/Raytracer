@@ -30,25 +30,38 @@ Ray getRayToPixel(int x, int y, int width, int height) {
 }
 
 Vec3 trace(const Ray& ray, const std::vector<Sphere>& spheres) {
+    // TODO: Add support for multiple light sources and shadows
+    float closestT;
+    Sphere* closestSphere = nullptr;
+
     for (const auto& sphere : spheres) {
         float t;
         if (sphere.intersect(ray, t)) {
-            Vec3 hitPoint = ray.origin + ray.direction * t;
-            Vec3 normal = (hitPoint - sphere.center).normalize();
-            // Find all emission sources and add their contribution
-            for (const auto& s : spheres) {
-                if (s.emissionStrength > 0) {
-                    Vec3 shadowRayDir = (s.center - hitPoint).normalize();
-                    Ray shadowRay(hitPoint, shadowRayDir);
-                    for (const auto& other : spheres) {
-                        if (&other != &s && other.intersect(shadowRay, t)) {
-                            // Blocks light, does not contribute.
-                            continue;
-                        }
-                    }
-                    return sphere.color * s.emissionStrength * std::max(0.0f, normal.dot(shadowRayDir));
+            if (!closestSphere || t < closestT) {
+                closestT = t;
+                closestSphere = const_cast<Sphere*>(&sphere);
+            }
+        }
+    }
+
+    if (!closestSphere) {
+        return Vec3(0, 0, 0); // Background color
+    }
+
+    Vec3 hitPoint = ray.origin + ray.direction * closestT;
+    Vec3 normal = (hitPoint - closestSphere->center).normalize();
+    // Find all emission sources and add their contribution
+    for (const auto& s : spheres) {
+        if (s.emissionStrength > 0) {
+            Vec3 shadowRayDir = (s.center - hitPoint).normalize();
+            Ray shadowRay(hitPoint, shadowRayDir);
+            for (const auto& other : spheres) {
+                if (&other != &s && other.intersect(shadowRay, closestT)) {
+                    // Blocks light, does not contribute.
+                    continue;
                 }
             }
+            return closestSphere->color * s.emissionStrength * std::max(0.0f, normal.dot(shadowRayDir));
         }
     }
     return Vec3(0, 0, 0); // Return background color for miss
