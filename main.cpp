@@ -33,7 +33,22 @@ Vec3 trace(const Ray& ray, const std::vector<Sphere>& spheres) {
     for (const auto& sphere : spheres) {
         float t;
         if (sphere.intersect(ray, t)) {
-            return sphere.color;
+            Vec3 hitPoint = ray.origin + ray.direction * t;
+            Vec3 normal = (hitPoint - sphere.center).normalize();
+            // Find all emission sources and add their contribution
+            for (const auto& s : spheres) {
+                if (s.emissionStrength > 0) {
+                    Vec3 shadowRayDir = (s.center - hitPoint).normalize();
+                    Ray shadowRay(hitPoint, shadowRayDir);
+                    for (const auto& other : spheres) {
+                        if (&other != &s && other.intersect(shadowRay, t)) {
+                            // Blocks light, does not contribute.
+                            continue;
+                        }
+                    }
+                    return sphere.color * s.emissionStrength * std::max(0.0f, normal.dot(shadowRayDir));
+                }
+            }
         }
     }
     return Vec3(0, 0, 0); // Return background color for miss
@@ -67,7 +82,9 @@ void render(std::vector<Sphere>& spheres) {
 int main() {
     std::vector<Sphere> spheres;
     Sphere sphere(Vec3(0, 0, -5), 1.0f, Vec3(255, 0, 0));
+    Sphere source(Vec3(2, 2, -5), 0.1f, Vec3(255, 0, 0), 1.0f);
     spheres.push_back(sphere);
+    spheres.push_back(source);
     render(spheres);
     return 0;
 }

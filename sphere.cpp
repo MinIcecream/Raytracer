@@ -4,10 +4,9 @@
 #include <cmath>
 
 class Sphere: public Shape {
+public:    
     Vec3 center;
     float radius;
-
-public:    
     Vec3 color;
     float emissionStrength;
 
