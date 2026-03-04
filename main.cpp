@@ -77,7 +77,7 @@ Vec3 trace(const Ray& ray, const std::vector<Sphere>& spheres, int depth = 0) {
         }
         float R0 = pow((1.0f - ior) / (1.0f + ior), 2.0f);
         float R = R0 + (1 - R0) * pow(1 - cosi, 5);
-        color = reflectedColor * R + refractedColor * (1 - R);
+        color = reflectedColor * R + (refractedColor * (1 - R) * closestSphere->transparency) * closestSphere->color;
         return color;
     }
 
@@ -136,7 +136,7 @@ void render(std::vector<Sphere>& spheres) {
 int main() {
     std::vector<Sphere> spheres;
     Sphere sphere(Vec3(0, -3, -5), 1.0f, Vec3(1.0, 0, 0));
-    Sphere glassSphere(Vec3(0, 3, -5), 1.0f, Vec3(1.0, 0, 0), 0.5f);
+    Sphere glassSphere(Vec3(3, 0, -5), 1.0f, Vec3(1, 0.5, 0.5), 1.0f);
     Sphere source(Vec3(2, 2, -5), 0.1f, Vec3(1.0, 0, 0), 0, Vec3(1.0, 1.0, 1.0)); // Light source
     Sphere floor(Vec3(0, -10004, -5), 10000.0f, Vec3(0.8, 0.8, 0.8));
     spheres.push_back(sphere);
