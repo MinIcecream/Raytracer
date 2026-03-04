@@ -8,9 +8,10 @@ public:
     Vec3 center;
     float radius;
     Vec3 color;
-    float emissionStrength;
+    float transparency;
+    Vec3 emissionColor;
 
-    Sphere(const Vec3& center, float radius, const Vec3& color, float emissionStrength = 0) : center(center), radius(radius), color(color), emissionStrength(emissionStrength) {}
+    Sphere(const Vec3& center, float radius, const Vec3& color, float transparency = 0, const Vec3& emissionColor = Vec3(0, 0, 0)) : center(center), radius(radius), color(color), transparency(transparency), emissionColor(emissionColor) {}
     
     bool intersect(const Ray& ray, float& t) const override {
         Vec3 L = ray.origin - center;
