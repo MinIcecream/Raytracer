@@ -140,14 +140,86 @@ void render(std::vector<Sphere>& spheres) {
 int main() {
     std::vector<Sphere> spheres;
 
-    // center, radius, surface color, transparency, emission color
-    spheres.push_back(Sphere(Vec3( 0.0, -10004, -20), 10000, Vec3(0.20, 0.20, 0.20), 0, Vec3(0, 0, 0)));
-    spheres.push_back(Sphere(Vec3( 0.0,      0, -20),     4, Vec3(1.00, 0.32, 0.36), 0.8, Vec3(0.5, 0.5, 0.5)));
-    spheres.push_back(Sphere(Vec3( 5.0,     -1, -15),     2, Vec3(0.90, 0.76, 0.46), 0.8, Vec3(0, 0, 0)));
-    spheres.push_back(Sphere(Vec3( 5.0,      0, -25),     3, Vec3(0.65, 0.77, 0.97), 0.8, Vec3(0, 0, 0)));
-    spheres.push_back(Sphere(Vec3(-5.5,      0, -15),     3, Vec3(0.90, 0.90, 0.90), 0.8, Vec3(0, 0, 0)));
-    // light source
-    spheres.push_back(Sphere(Vec3( 0.0,     20, -30),     3, Vec3(0.00, 0.00, 0.00), 0, Vec3(3, 3, 3)));
+    // floor
+    spheres.push_back(Sphere(
+        Vec3(0,-10004,-20),
+        10000,
+        Vec3(0.25,0.25,0.25),
+        0,
+        Vec3(0,0,0)
+    ));
+
+    // center glass sphere
+    spheres.push_back(Sphere(
+        Vec3(0,0,-15),
+        4,
+        Vec3(0.95,0.95,1.0),
+        0.9,
+        Vec3(0,0,0)
+    ));
+
+    // blue matte
+    spheres.push_back(Sphere(
+        Vec3(-6,-1.5,-13),
+        2.5,
+        Vec3(0.4,0.2,1.0),
+        0,
+        Vec3(0,0,0)
+    ));
+
+    // green glass
+    spheres.push_back(Sphere(
+        Vec3(6,-1.5,-13),
+        2.5,
+        Vec3(0.4,1.0,0.6),
+        0.9,
+        Vec3(0,0,0)
+    ));
+
+    // red glass sphere
+    spheres.push_back(Sphere(
+        Vec3(-3,-2.2,-9),
+        1.8,
+        Vec3(1.0,0.1,0.1),
+        0.9,
+        Vec3(0,0,0)
+    ));
+
+    // yellow matte sphere
+    spheres.push_back(Sphere(
+        Vec3(3,-2,-11),
+        2,
+        Vec3(1.0,0.9,0.3),
+        0,
+        Vec3(0,0,0)
+    ));
+
+    // mirror-ish sphere
+    spheres.push_back(Sphere(
+        Vec3(0,-2.5,-7),
+        1.5,
+        Vec3(0.9,0.9,0.9),
+        0,
+        Vec3(0,0,0)
+    ));
+
+    // main light
+    spheres.push_back(Sphere(
+        Vec3(0,20,-35),
+        3,
+        Vec3(0,0,0),
+        0,
+        Vec3(1.5, 1.5, 1.5)
+    ));
+
+    // secondary light
+    spheres.push_back(Sphere(
+        Vec3(-15,10,-5),
+        3,
+        Vec3(0,0,0),
+        0,
+        Vec3(2,2,2)
+    ));
     render(spheres);
     return 0;
 }
