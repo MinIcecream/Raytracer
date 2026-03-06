@@ -85,6 +85,7 @@ Vec3 trace(const Ray& ray, const std::vector<Sphere>& spheres, int depth = 0) {
     for (const auto& s : spheres) {
         if (s.emissionColor .x > 0 || s.emissionColor.y > 0 || s.emissionColor.z > 0) {
             bool blocked = false;
+            float transmission = 1.0f;
             Vec3 toLight = s.center - hitPoint;
             Vec3 shadowRayOrigin = hitPoint + normal * 0.001f; // Offset to avoid self-intersection
             Vec3 shadowRayDir = toLight.normalize();
@@ -94,15 +95,18 @@ Vec3 trace(const Ray& ray, const std::vector<Sphere>& spheres, int depth = 0) {
                 if (&other != &s && other.intersect(shadowRay, t)) {
                     if (t < toLight.length()){
                         // Blocks light, does not contribute.
-                        blocked = true;
-                        break;
+                        transmission *= other.transparency;
+                        if (transmission < 0.01f) {
+                            blocked = true;
+                            break;
+                        }
                     }
                 }
             }
             if (blocked) {
                 continue;
             }
-            color = color + closestSphere->color * s.emissionColor * std::max(0.0f, normal.dot(shadowRayDir));
+            color = color + transmission * closestSphere->color * s.emissionColor * std::max(0.0f, normal.dot(shadowRayDir));
         }
     }
     return color + closestSphere->emissionColor;
@@ -138,10 +142,10 @@ int main() {
 
     // center, radius, surface color, transparency, emission color
     spheres.push_back(Sphere(Vec3( 0.0, -10004, -20), 10000, Vec3(0.20, 0.20, 0.20), 0, Vec3(0, 0, 0)));
-    spheres.push_back(Sphere(Vec3( 0.0,      0, -20),     4, Vec3(1.00, 0.32, 0.36), 1, Vec3(0.5, 0.5, 0.5)));
-    spheres.push_back(Sphere(Vec3( 5.0,     -1, -15),     2, Vec3(0.90, 0.76, 0.46), 1, Vec3(0, 0, 0)));
-    spheres.push_back(Sphere(Vec3( 5.0,      0, -25),     3, Vec3(0.65, 0.77, 0.97), 1, Vec3(0, 0, 0)));
-    spheres.push_back(Sphere(Vec3(-5.5,      0, -15),     3, Vec3(0.90, 0.90, 0.90), 1, Vec3(0, 0, 0)));
+    spheres.push_back(Sphere(Vec3( 0.0,      0, -20),     4, Vec3(1.00, 0.32, 0.36), 0.8, Vec3(0.5, 0.5, 0.5)));
+    spheres.push_back(Sphere(Vec3( 5.0,     -1, -15),     2, Vec3(0.90, 0.76, 0.46), 0.8, Vec3(0, 0, 0)));
+    spheres.push_back(Sphere(Vec3( 5.0,      0, -25),     3, Vec3(0.65, 0.77, 0.97), 0.8, Vec3(0, 0, 0)));
+    spheres.push_back(Sphere(Vec3(-5.5,      0, -15),     3, Vec3(0.90, 0.90, 0.90), 0.8, Vec3(0, 0, 0)));
     // light source
     spheres.push_back(Sphere(Vec3( 0.0,     20, -30),     3, Vec3(0.00, 0.00, 0.00), 0, Vec3(3, 3, 3)));
     render(spheres);
